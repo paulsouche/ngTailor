@@ -1,5 +1,5 @@
 angular.module('{%= name %}').controller('mainController', function ($scope) {
-    "use strict";
+  'use strict';
 
-    $scope.message = "Yeahhh ! You're ready !";
+  $scope.message = 'Yeahhh ! You\'re ready !';
 });
