@@ -26,7 +26,7 @@ module.exports = function(grunt) {
               'package' : 'Package your web app for distribution',
               'ci' : 'Run unit & e2e tests, package your webapp and generate reports. Use this task for Continuous Integration'
             },
-            tasks: ['dev', {% if (tests.unit) { %}'test:unit',{% } %} {% if (tests.e2e) { %}'test:e2e',{% } %}  'package', {% if (complexity) { %}'report',{% } %} 'ci']
+            tasks: ['dev',{% if (tests.unit) { %}'test:unit',{% } %}{% if (tests.e2e) { %}'test:e2e',{% } %}  'package',{% if (complexity) { %}'report',{% } %}'ci']
           }
         }
       },
@@ -86,10 +86,7 @@ module.exports = function(grunt) {
             dot: true,
             cwd: '<%= assetsDir %>',
             dest: '<%= distDir %>/',
-            src: [
-              'index.html',
-              'img/**'
-            ]
+            src: ['index.html','img/**','fonts/**'{% if (!templateCache) { %},'partials/**/*.html'{% } %}]
           }]
         }
       }{% if (csslint) { %},
@@ -174,12 +171,27 @@ module.exports = function(grunt) {
             dest: '.tmp/concat/js'
           }]
         }
-      }{% if (complexity) { %},
-        plato: {
+      }{% if (templateCache) { %},
+      ngtemplates: {
+        dist: {
+          src: '<%= assetsDir %>/partials/**/*.html',
+          dest: '<%= assetsDir %>/js/templates.js',
           options: {
-            jshint: grunt.file.readJSON('.jshintrc'),
-            title : '{%= title %}'
-          },
+            module: '{%= name %}',
+            usemin: 'js/{%= name %}.js',
+            htmlmin:  {
+              collapseBooleanAttributes: true,
+              collapseWhitespace:        true,
+              removeAttributeQuotes:     true
+            }
+          }
+        }
+      }{% } %}{% if (complexity) { %},
+      plato: {
+        options: {
+          jshint: grunt.file.readJSON('.jshintrc'),
+          title : '{%= title %}'
+        },
         all: {
           files: {
             'reports/complexity': ['<%= assetsDir %>/js/**/*.js']
@@ -266,7 +278,7 @@ module.exports = function(grunt) {
     {% if (tests.unit) { %}grunt.registerTask('test:unit', ['karma:dist_unit:start']);{% } %}
     {% if (complexity) { %}grunt.registerTask('report', ['plato', 'connect:plato']);{% } %}
     grunt.registerTask('dev', [{% if (csspreprocessor === 'less') { %}'less:all',{% } %}{% if (csspreprocessor === 'sass') { %}'sass',{% } %}'browser_sync',{% if (tests.unit) { %}'karma:dev_unit:start',{% } %}'watch']);
-    grunt.registerTask('package', ['jshint','clean','useminPrepare','copy','concat','ngmin','uglify',{% if (csspreprocessor === 'less') { %}'less:all',{% } %}{% if (csspreprocessor === 'sass') { %}'sass',{% } %}'cssmin',{% if (revision) { %}'rev',{% } %}{% if (imagemin === true) { %}'imagemin',{% } %}'usemin']);
+    grunt.registerTask('package', ['jshint','clean','useminPrepare',{% if (templateCache) { %}'ngtemplates',{% } %}'copy','concat','ngmin','uglify',{% if (csspreprocessor === 'less') { %}'less:all',{% } %}{% if (csspreprocessor === 'sass') { %}'sass',{% } %}'cssmin',{% if (revision) { %}'rev',{% } %}{% if (imagemin === true) { %}'imagemin',{% } %}'usemin']);
     grunt.registerTask('ci', ['package'{%if(tests.unit || tests.e2e){%},'connect:test',{% } %} {%if(tests.unit){%}'karma:dist_unit:start',{% } %} {%if(tests.e2e){%}'karma:e2e'{% } %}{% if (complexity) { %},'plato'{% } %}]);
     grunt.registerTask('ls', ['availabletasks']);
 

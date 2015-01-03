@@ -68,6 +68,7 @@ exports.template = function(grunt, init, done) {
         csspreprocessor : 'none',
         tests : false,
         imagemin : false,
+        templateCache : false,
         modules : [],
         thirdModules : []
     };
@@ -152,41 +153,45 @@ exports.template = function(grunt, init, done) {
             version: options.version,
             description: options.description,
             devDependencies: {
-                "grunt-usemin": "~2.0.0",
-                "grunt-ngmin": "0.0.3",
+                "grunt-available-tasks": "~0.4.2",
+                "grunt-bower-install": "~0.8.0",
+                "grunt-bower-task": "~0.3.4",
+                "grunt-browser-sync": "~0.4.8",
                 "grunt-contrib-clean": "~0.5.0",
                 "grunt-contrib-concat": "~0.3.0",
+                "grunt-contrib-connect": "~0.5.0",
+                "grunt-contrib-copy": "~0.4.1",
+                "grunt-contrib-jshint": "~0.7.2",
                 "grunt-contrib-uglify": "~0.2.7",
                 "grunt-contrib-cssmin": "~0.7.0",
                 "grunt-contrib-watch": "~0.5.3",
-                "grunt-bower-task": "~0.3.4",
-                "grunt-contrib-copy": "~0.4.1",
-                "grunt-contrib-jshint": "~0.7.2",
-                "grunt-contrib-connect": "~0.5.0",
-                "load-grunt-tasks": "~0.2.0",
-                "grunt-bower-install": "~0.8.0",
                 "grunt-newer": "~0.6.0",
-                "grunt-browser-sync": "~0.4.8",
-                "grunt-available-tasks": "~0.4.2"
+                "grunt-ngmin": "0.0.3",
+                "grunt-usemin": "~2.0.0",
+                "load-grunt-tasks": "~0.2.0"
             }
         };
 
-        if (options.test === true && options.tests.unit === true) {
+        if (options.test === true) {
+
             packageContent.devDependencies['grunt-karma'] = "~0.6.2";
-            packageContent.devDependencies['karma-ng-html2js-preprocessor'] = "~0.1.0";
-            packageContent.devDependencies['karma-chrome-launcher'] = "~0.1.0";
-            packageContent.devDependencies['karma-firefox-launcher'] = "~0.1.0";
-            packageContent.devDependencies['karma-jasmine'] = "~0.1.3";
-            packageContent.devDependencies['karma-phantomjs-launcher'] = "~0.1.0";
             packageContent.devDependencies['karma'] = "~0.10.4";
-            packageContent.devDependencies['karma-coverage'] = "~0.1.4";
+
+            if (options.tests.unit === true) {
+                packageContent.devDependencies['karma-chrome-launcher'] = "~0.1.0";
+                packageContent.devDependencies['karma-coverage'] = "~0.1.4";
+                packageContent.devDependencies['karma-firefox-launcher'] = "~0.1.0";
+                packageContent.devDependencies['karma-jasmine'] = "~0.1.3";
+                packageContent.devDependencies['karma-ng-html2js-preprocessor'] = "~0.1.0";
+                packageContent.devDependencies['karma-phantomjs-launcher'] = "~0.1.0";
+            }
+
+            if (options.tests.e2e === true) {
+                packageContent.devDependencies['karma-ng-scenario'] = "~0.1.0";
+            }
+
         }
 
-        if (options.test === true && options.tests.e2e === true) {
-            packageContent.devDependencies['grunt-karma'] = "~0.6.2";
-            packageContent.devDependencies['karma-ng-scenario'] = "~0.1.0";
-            packageContent.devDependencies['karma'] = "~0.10.4";
-        }
 
         if (options.revision === true) {
             packageContent.devDependencies['grunt-rev'] = "~0.1.0";
@@ -198,6 +203,10 @@ exports.template = function(grunt, init, done) {
 
         if (options.csspreprocessor === 'less') {
             packageContent.devDependencies['grunt-contrib-less'] = "~0.10.0";
+        }
+
+        if (options.templateCache === true) {
+            packageContent.devDependencies['grunt-angular-templates'] = "~0.5.7";
         }
 
         if (options.csslint === true) {
@@ -393,6 +402,12 @@ exports.template = function(grunt, init, done) {
                     message: 'Should I set up one of those CSS preprocessors ?',
                     choices: [ "none", "sass", "less" ],
                     default: 0
+                },
+                {
+                    type: "confirm",
+                    name: "templateCache",
+                    message: "Should I cache your html templates ?",
+                    default: false
                 },
                 {
                     type: "confirm",
