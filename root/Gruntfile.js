@@ -7,6 +7,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         assetsDir: 'app',
         distDir: 'dist',
+        {% if (test) { %}testsDir:'test',{% } %}
         availabletasks: {
             tasks: {
                 options: {
@@ -121,10 +122,22 @@ module.exports = function(grunt) {
             },
             all: {
                 src : ['<%= assetsDir %>/js/**/*.js']
-            }
+            }{% if (tests.unit) { %},
+            unit:{
+              options: {
+                jshintrc: '<%= testsDir %>/.jshintrc'
+              },
+              src: ['<%= testsDir %>/unit/**/*.js']
+            }{% } %}{% if (tests.e2e) { %},
+            e2e:{
+              options: {
+                jshintrc: '<%= testsDir %>/.jshintrc'
+              },
+              src: ['<%= testsDir %>/e2e/**/*.js']
+            }{% } %}
         }{% if (test) { %},
-        karma: {
-            {% if (tests.unit) { %}dev_unit: {
+        karma: {{% if (tests.unit) { %}
+            dev_unit: {
                 options: {
                     configFile: 'test/conf/unit-test-conf.js',
                         background: true,  // The background option will tell grunt to run karma in a child process so it doesn't block subsequent grunt tasks.
@@ -219,8 +232,16 @@ module.exports = function(grunt) {
             },
             js: {
                 files: ['<%= assetsDir %>/js/**/*.js'],
-                tasks: ['newer:jshint' {% if (test) { %}, 'karma:dev_unit:run' {% } %}]
-            },
+                tasks: ['newer:jshint:all' {% if (test.unit) { %}, 'karma:dev_unit:run' {% } %}]
+            }{% if (tests.unit) { %},
+            unit: {
+                files: ['<%= testsDir %>/unit/**/*.js'],
+                tasks: ['newer:jshint:unit', 'karma:dev_unit:run']
+            }{% } %}{% if (tests.e2e) { %},
+            e2e: {
+                files: ['<%= testsDir %>/e2e/**/*.js'],
+                tasks: ['newer:jshint:e2e']
+            }{% } %},
             html: {
                 files: ['<%= assetsDir %>/**/*.html']
             },
