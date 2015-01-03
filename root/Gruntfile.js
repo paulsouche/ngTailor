@@ -1,20 +1,18 @@
 module.exports = function(grunt) {
 
-    "use strict";
+    'use strict';
 
     require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
-
         assetsDir: 'app',
         distDir: 'dist',
-
         availabletasks: {
             tasks: {
                 options: {
                     filter: 'include',
                     groups: {
-                        'Development': ['dev', {% if (tests.unit) { %}'test:unit',{% } %} {% if (tests.e2e) { %}'test:e2e',{% } %} {% if (complexity) { %}'report'{% } %}],
+                        'Development': ['dev'{% if (tests.unit) { %},'test:unit'{% } %}{% if (tests.e2e) { %},'test:e2e'{% } %}{% if (complexity) { %},'report'{% } %}],
                         'Production': ['package'],
                         'Continuous Integration': ['ci']
                     },
@@ -39,42 +37,6 @@ module.exports = function(grunt) {
                 cssPattern: '<link rel="stylesheet" href="{{filePath}}" >'
             }
         },
-        clean: {
-            dist: ['.tmp', '<%= distDir %>']
-        },
-        copy: {
-            dist: {
-                files: [{
-                    expand: true,
-                    dot: true,
-                    cwd: '<%= assetsDir %>',
-                    dest: '<%= distDir %>/',
-                    src: [
-                        'index.html',
-                        'img/**'
-                    ]
-                }]
-            }
-        },
-        ngmin: {
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '.tmp/concat/js',
-                    src: '*.js',
-                    dest: '.tmp/concat/js'
-                }]
-            }
-        },
-        useminPrepare: {
-            html: '<%= assetsDir %>/index.html',
-            options: {
-                dest: '<%= distDir %>'
-            }
-        },
-        usemin: {
-            html: '<%= distDir %>/index.html'
-        },
         browser_sync: {
             dev: {
                 bsFiles: {
@@ -89,65 +51,16 @@ module.exports = function(grunt) {
                         forms: true
                     },
                     server: {
-                        baseDir: "<%= assetsDir %>"
+                        baseDir: '<%= assetsDir %>'
                     }
                 }
             }
         },
-        jshint: {
-            options: {
-                jshintrc: '.jshintrc'
-            },
-            all : {
-                src : ['<%= assetsDir %>/js/**/*.js']
-            }
-        }{% if (revision) { %},
-        rev: {
-            dist: {
-                files: {
-                    src: [
-                        '<%= distDir %>/js/{,*/}*.js',
-                        '<%= distDir %>/css/{,*/}*.css'
-                    ]
-                }
-            }
-        }{% } %},
-        watch: {
-            options : {
-                interrupt: true
-            },
-            js: {
-                files: ['<%= assetsDir %>/js/**/*.js'],
-                tasks: ['newer:jshint' {% if (test) { %}, 'karma:dev_unit:run' {% } %}]
-            },
-            html : {
-                files: ['<%= assetsDir %>/**/*.html']
-            },
-            css: {
-                files: ['<%= assetsDir %>/css/**/*.css']{% if (csslint) { %},
-                tasks: ['csslint']
-                {% } %}
-            }{% if (csspreprocessor === 'sass') { %},
-            scss: {
-                files : ['<%= assetsDir %>/scss/**/*.scss'],
-                tasks: ['sass:all']
-            }{% } %}
-            {% if (csspreprocessor === 'less') { %},
-                less: {
-                    files : ['<%= assetsDir %>/less/**/*.less'],
-                        tasks: ['less:all']
-            }{% } %}
-        }{% if (csslint) { %},
-        csslint: {
-            options: {
-                csslintrc: '.csslintrc'
-            },
-            all : {
-                src : ['<%= assetsDir %>/css/**/*.css']
-            }
-        }{% } %},
+        clean: {
+            dist: ['.tmp', '<%= distDir %>']
+        },
         connect: {
-            test : {
+            test: {
                 options: {
                     port: 8887,
                         base: '<%= assetsDir %>',
@@ -156,7 +69,7 @@ module.exports = function(grunt) {
                         open: false
                 }
             }{% if (complexity) { %},
-            plato : {
+            plato: {
                 options: {
                     port: 8889,
                         base: 'reports/complexity',
@@ -164,6 +77,51 @@ module.exports = function(grunt) {
                         open: true
                 }
             }{% } %}
+        },
+        copy: {
+            dist: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= assetsDir %>',
+                    dest: '<%= distDir %>/',
+                    src: [
+                        'index.html',
+                        'img/**'
+                    ]
+                }]
+            }
+        }{% if (csslint) { %},
+        csslint: {
+            options: {
+                csslintrc: '.csslintrc'
+            },
+            all: {
+                src : ['<%= assetsDir %>/css/**/*.css']
+            }
+        }{% } %}{% if (imagemin === true) { %},
+        imagemin: {
+            dist: {
+                options : {
+                    optimizationLevel: 7,
+                    progressive : false,
+                    interlaced : true
+                },
+                files: [{
+                    expand: true,
+                    cwd: '<%= assetsDir %>/',
+                    src: ['**/*.{png,jpg,gif}'],
+                    dest: '<%= distDir %>/'
+                }]
+            }
+        }{% } %},
+        jshint: {
+            options: {
+                jshintrc: '.jshintrc'
+            },
+            all: {
+                src : ['<%= assetsDir %>/js/**/*.js']
+            }
         }{% if (test) { %},
         karma: {
             {% if (tests.unit) { %}dev_unit: {
@@ -182,9 +140,9 @@ module.exports = function(grunt) {
                         singleRun: true,
                         autoWatch: false,
                         reporters: ['progress', 'coverage'],
-                        coverageReporter : {
-                            type : 'html',
-                            dir : '../reports/coverage'
+                        coverageReporter: {
+                            type: 'html',
+                            dir: '../reports/coverage'
                         }
                 }
             },{% } %}
@@ -193,15 +151,35 @@ module.exports = function(grunt) {
                     configFile: 'test/conf/e2e-test-conf.js'
                 }
             }{% } %}
-        }{% } %}{% if (complexity) { %},
-        plato : {
+        }{% } %},
+        ngmin: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: '.tmp/concat/js',
+                    src: '*.js',
+                    dest: '.tmp/concat/js'
+                }]
+            }
+        }{% if (complexity) { %},
+        plato: {
             options: {
-                jshint : grunt.file.readJSON('.jshintrc'),
+                jshint: grunt.file.readJSON('.jshintrc'),
                     title : '{%= title %}'
             },
-            all : {
+            all: {
                 files: {
                     'reports/complexity': ['<%= assetsDir %>/js/**/*.js']
+                }
+            }
+        }{% } %}{% if (revision) { %},
+        rev: {
+            dist: {
+                files: {
+                    src: [
+                        '<%= distDir %>/js/{,*/}*.js',
+                        '<%= distDir %>/css/{,*/}*.css'
+                    ]
                 }
             }
         }{% } %}{% if (csspreprocessor === 'less') { %},
@@ -211,36 +189,56 @@ module.exports = function(grunt) {
             },
             all: {
                 files: {
-                    "<%= assetsDir %>/css/app.css": "<%= assetsDir %>/less/app.less"
+                    '<%= assetsDir %>/css/app.css': '<%= assetsDir %>/less/app.less'
                 }
             }
         }{% } %}{% if (csspreprocessor === 'sass') { %},
         sass: {
-            options : {
-                style : 'expanded',
-                trace : true
+            options: {
+                style: 'expanded',
+                trace: true
             },
             all: {
                 files: {
                     '<%= assetsDir %>/css/app.css': '<%= assetsDir %>/scss/app.scss'
                 }
             }
-        }{% } %}{% if (imagemin === true) { %},
-        imagemin : {
-            dist : {
-                options : {
-                    optimizationLevel: 7,
-                    progressive : false,
-                    interlaced : true
-                },
-                files: [{
-                    expand: true,
-                    cwd: '<%= assetsDir %>/',
-                    src: ['**/*.{png,jpg,gif}'],
-                    dest: '<%= distDir %>/'
-                }]
+        }{% } %},
+        usemin: {
+            html: '<%= distDir %>/index.html'
+        },
+        useminPrepare: {
+            html: '<%= assetsDir %>/index.html',
+            options: {
+                dest: '<%= distDir %>'
             }
-        }{% } %}
+        },
+        watch: {
+            options: {
+                interrupt: true
+            },
+            js: {
+                files: ['<%= assetsDir %>/js/**/*.js'],
+                tasks: ['newer:jshint' {% if (test) { %}, 'karma:dev_unit:run' {% } %}]
+            },
+            html: {
+                files: ['<%= assetsDir %>/**/*.html']
+            },
+            css: {
+                files: ['<%= assetsDir %>/css/**/*.css']{% if (csslint) { %},
+                tasks: ['csslint']
+                {% } %}
+            }{% if (csspreprocessor === 'sass') { %},
+            scss: {
+                files: ['<%= assetsDir %>/scss/**/*.scss'],
+                tasks: ['sass:all']
+            }{% } %}
+            {% if (csspreprocessor === 'less') { %},
+            less: {
+                files: ['<%= assetsDir %>/less/**/*.less'],
+                    tasks: ['less:all']
+            }{% } %}
+        }
     });
 
     {% if (tests.e2e) { %}grunt.registerTask('test:e2e', ['connect:test', 'karma:e2e']);{% } %}
