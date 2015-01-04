@@ -66,6 +66,7 @@ exports.template = function(grunt, init, done) {
         gitignore : false,
         i18n : false,
         csspreprocessor : 'none',
+        ecmaCompilator : 'none',
         tests : false,
         imagemin : false,
         modules : [],
@@ -92,6 +93,14 @@ exports.template = function(grunt, init, done) {
 
         if (options.csslint === false) {
             delete files['.csslintrc'];
+        }
+
+        if (options.ecmaCompilator === 'typescript') {
+            delete files['app/js/app.js'];
+            delete files['app/js/controllers/mainCtrl.js'];
+        } else {
+            delete files['app/ts/app.ts'];
+            delete files['app/ts/controllers/mainCtrl.ts'];
         }
 
         if (options.csspreprocessor !== 'sass') {
@@ -192,6 +201,10 @@ exports.template = function(grunt, init, done) {
             packageContent.devDependencies['grunt-rev'] = "~0.1.0";
         }
 
+        if (options.ecmaCompilator === 'typescript') {
+            packageContent.devDependencies['grunt-typescript'] = "~0.4.8";
+        }
+
         if (options.csspreprocessor === 'sass') {
             packageContent.devDependencies['grunt-contrib-sass'] = "~0.6.0";
         }
@@ -232,6 +245,10 @@ exports.template = function(grunt, init, done) {
 
         if (options.test === true) {
             bowerContent.devDependencies['angular-mocks'] = options.angular_version;
+        }
+
+        if (options.ecmaCompilator === 'typescript') {
+            bowerContent.devDependencies['DefinitelyTyped'] = '*';
         }
 
         if(options.modules){
@@ -359,6 +376,13 @@ exports.template = function(grunt, init, done) {
                     name: 'thirdModules',
                     message: 'What amazing angular modules do you need ?',
                     choices: [ "angular-ui-router", "angular-translate", "angular-snap", "revolunet-angular-carousel", "angular-bindonce" ]
+                },
+                {
+                    type: "list",
+                    name: 'ecmaCompilator',
+                    message: 'Would you like to use a compilator ?',
+                    choices: [ "none", "typescript" ],
+                    default: 0
                 },
                 {
                     type: "confirm",
