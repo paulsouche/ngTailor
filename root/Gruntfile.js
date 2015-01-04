@@ -228,6 +228,17 @@ module.exports = function(grunt) {
             '<%= assetsDir %>/css/app.css': '<%= assetsDir %>/scss/app.scss'
           }
         }
+      }{% } %}{% if (ecmaCompilator === 'typescript') { %},
+      typescript: {
+        base: {
+          src: ['<%= assetsDir %>/ts/app.ts'],
+          dest: '<%= assetsDir %>/js/app.js',
+          options: {
+            removeComments: true,
+            sourceMap: true,
+            declaration: true
+          }
+        }
       }{% } %},
       usemin: {
         html: '<%= distDir %>/index.html'
@@ -244,7 +255,7 @@ module.exports = function(grunt) {
         },
         js: {
           files: ['<%= assetsDir %>/js/**/*.js'],
-          tasks: ['newer:jshint:all' {% if (test.unit) { %}, 'karma:dev_unit:run' {% } %}]
+          tasks: [{% if (ecmaCompilator === 'none') { %}'newer:jshint:all'{% } %}{% if (test.unit) { %}, 'karma:dev_unit:run' {% } %}]
         }{% if (tests.unit) { %},
         unit: {
           files: ['<%= testsDir %>/unit/**/*.js'],
@@ -256,20 +267,22 @@ module.exports = function(grunt) {
         }{% } %},
         html: {
           files: ['<%= assetsDir %>/**/*.html']
-        },{% if (csslint) { %}
+        }{% if (csslint) { %},
         css: {
           files: ['<%= assetsDir %>/css/**/*.css'],
           tasks: ['csslint']
-        }{% } %}
-        {% if (csspreprocessor === 'sass') { %},
+        }{% } %}{% if (csspreprocessor === 'sass') { %},
         scss: {
           files: ['<%= assetsDir %>/scss/**/*.scss'],
           tasks: ['sass:all']
-        }{% } %}
-        {% if (csspreprocessor === 'less') { %},
+        }{% } %}{% if (csspreprocessor === 'less') { %},
         less: {
           files: ['<%= assetsDir %>/less/**/*.less'],
           tasks: ['less:all']
+        }{% } %}{% if (ecmaCompilator === 'typescript') { %},
+        ts: {
+          files: ['<%= assetsDir %>/ts/**/*.ts'],
+          tasks: ['typescript']
         }{% } %}
       }
     });
@@ -277,7 +290,7 @@ module.exports = function(grunt) {
     {% if (tests.e2e) { %}grunt.registerTask('test:e2e', ['connect:test', 'karma:e2e']);{% } %}
     {% if (tests.unit) { %}grunt.registerTask('test:unit', ['karma:dist_unit:start']);{% } %}
     {% if (complexity) { %}grunt.registerTask('report', ['plato', 'connect:plato']);{% } %}
-    grunt.registerTask('dev', [{% if (csspreprocessor === 'less') { %}'less:all',{% } %}{% if (csspreprocessor === 'sass') { %}'sass',{% } %}'browser_sync',{% if (tests.unit) { %}'karma:dev_unit:start',{% } %}'watch']);
+    grunt.registerTask('dev', [{% if (ecmaCompilator === 'typescript') { %}'typescript',{% } %}{% if (csspreprocessor === 'less') { %}'less:all',{% } %}{% if (csspreprocessor === 'sass') { %}'sass',{% } %}'browser_sync',{% if (tests.unit) { %}'karma:dev_unit:start',{% } %}'watch']);
     grunt.registerTask('package', ['jshint','clean','useminPrepare',{% if (templateCache) { %}'ngtemplates',{% } %}'copy','concat','ngmin','uglify',{% if (csspreprocessor === 'less') { %}'less:all',{% } %}{% if (csspreprocessor === 'sass') { %}'sass',{% } %}'cssmin',{% if (revision) { %}'rev',{% } %}{% if (imagemin === true) { %}'imagemin',{% } %}'usemin']);
     grunt.registerTask('ci', ['package'{%if(tests.unit || tests.e2e){%},'connect:test',{% } %} {%if(tests.unit){%}'karma:dist_unit:start',{% } %} {%if(tests.e2e){%}'karma:e2e'{% } %}{% if (complexity) { %},'plato'{% } %}]);
     grunt.registerTask('ls', ['availabletasks']);

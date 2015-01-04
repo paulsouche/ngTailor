@@ -14,15 +14,15 @@
 </head>
 <body>
 
-<section class="message" ng-controller="mainController">
-    {{ message }}
+<section class="message" ng-controller="mainCtrl as main">
+    {{ main.message }}
 </section>
 
 <!-- build:js js/{%= name %}.js -->
 <!-- bower:js -->
 <!-- endbower -->
 <script type="text/javascript" src="js/app.js"></script>
-<script type="text/javascript" src="js/controllers/mainController.js"></script>
+<script type="text/javascript" src="js/controllers/mainCtrl.js"></script>
 <!-- endbuild -->
 
 </body>

@@ -1,20 +1,19 @@
 describe('{%= title %} application', function () {
   'use strict';
 
-  var scope;
+  var ctrl;
 
   beforeEach(module('{%= name %}'));
 
   // Loads the controllers
-  beforeEach(inject(function ($controller, $rootScope) {
-    scope = $rootScope.$new();
-    $controller('mainController', {$scope: scope});
+  beforeEach(inject(function ($controller) {
+    ctrl = $controller('mainCtrl');
   }));
 
 
   it('should have a success message initialized', inject(function () {
-    expect(scope.message).toBeTruthy();
-    expect(scope.message).toBe('Yeahhh ! You\'re ready !');
+    expect(ctrl.message).toBeTruthy();
+    expect(ctrl.message).toBe('Yeahhh ! You\'re ready !');
   }));
 
 });
