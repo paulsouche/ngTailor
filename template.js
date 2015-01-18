@@ -118,18 +118,20 @@ exports.template = function(grunt, init, done) {
             delete files['app/css/app.css'];
         }
 
+        if (options.test === false) {
+            delete files['test/.jshintrc'];
+        }
+
         if (options.test === false || options.tests.unit === false) {
             delete files['test'];
             delete files['test/conf/unit-test-conf.js'];
             delete files['test/unit/appSpec.js'];
-            delete files['test/.jshintrc'];
         }
 
         if (options.test === false || options.tests.e2e === false) {
             delete files['test'];
             delete files['test/conf/e2e-test-conf.js'];
             delete files['test/e2e/scenarios.js'];
-            delete files['test/.jshintrc'];
         }
 
         // build the list of angular official modules to declare as your module dependencies

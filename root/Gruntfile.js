@@ -155,7 +155,7 @@ module.exports = function(grunt) {
               dir: '../reports/coverage'
             }
           }
-        },{% } %}{% if (tests.e2e) { %}
+        }{% } %}{% if (tests.e2e) { %},
         e2e: {
           options: {
             configFile: 'test/conf/e2e-test-conf.js'
@@ -174,8 +174,9 @@ module.exports = function(grunt) {
       }{% if (templateCache) { %},
       ngtemplates: {
         dist: {
-          src: '<%= assetsDir %>/partials/**/*.html',
-          dest: '<%= assetsDir %>/js/templates.js',
+          cwd: '<%= assetsDir %>',
+          src: 'partials/**/*.html',
+          dest: '.tmp/js/templates.js',
           options: {
             module: '{%= name %}',
             usemin: 'js/{%= name %}.js',

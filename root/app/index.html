@@ -22,7 +22,7 @@
 <!-- bower:js -->
 <!-- endbower -->
 <script type="text/javascript" src="js/app.js"></script>
-<script type="text/javascript" src="js/controllers/mainCtrl.js"></script>
+{% if (ecmaCompilator === 'none') { %}<script type="text/javascript" src="js/controllers/mainCtrl.js"></script>{% } %}
 <!-- endbuild -->
 
 </body>
